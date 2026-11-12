@@ -1,13 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/index.css">
-  <script src="js/index.js"></script>
-  <title>Index.html</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background:#1e1e3f; font-family:Arial; padding:20px; }
+    h1 { color:gold; text-align:center; }
+    .saisie { display:flex; gap:8px; }
+    input { flex:1; padding:14px; border:none; border-radius:12px; font-size:16px; }
+    button { background:orange; color:white; border:none;
+             border-radius:12px; padding:0 18px; font-size:22px; }
+    ul { list-style:none; padding:0; }
+    li { background:white; margin-top:10px; padding:14px;
+         border-radius:12px; display:flex; justify-content:space-between; }
+    li.fait span { text-decoration:line-through; color:gray; }
+  </style>
 </head>
 <body>
-	<h1>Index.html</h1>
+  <h1>Mes tâches</h1>
+  <div class="saisie">
+    <input id="champ" placeholder="Nouvelle tâche...">
+    <button onclick="ajouter()">+</button>
+  </div>
+  <ul id="liste"></ul>
+
+  <script>
+    // On relit les tâches enregistrées (ou une liste vide au début)
+    var taches = JSON.parse(localStorage.getItem("taches") || "[]");
+
+    function sauver() {
+      localStorage.setItem("taches", JSON.stringify(taches));
+    }
+
+    function afficher() {
+      var liste = document.getElementById("liste");
+      liste.innerHTML = "";
+
+      taches.forEach(function (t, i) {
+        var li = document.createElement("li");
+        if (t.fait) { li.classList.add("fait"); }
+
+        var texte = document.createElement("span");
+        texte.textContent = t.texte;
+        texte.onclick = function () {
+          t.fait = !t.fait;
+          sauver();
+          afficher();
+        };
+
+        var croix = document.createElement("b");
+        croix.textContent = "❌";
+        croix.onclick = function () {
+          taches.splice(i, 1);
+          sauver();
+          afficher();
+        };
+
+        li.appendChild(texte);
+        li.appendChild(croix);
+        liste.appendChild(li);
+      });
+    }
+
+    function ajouter() {
+      var champ = document.getElementById("champ");
+      if (champ.value == "") { return; }
+      taches.push({ texte: champ.value, fait: false });
+      sauver();
+      afficher();
+      champ.value = "";
+    }
+
+    afficher();
+  </script>
 </body>
 </html>
